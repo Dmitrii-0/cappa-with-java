@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load news_tags %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <div class="one-col">
+        {% get_news as news %}
+        {% if news %}
+            <div class="news">
+                {% for new in news %}
+                    {% if new.card_type == 'horizontal' %}
+                        {% include 'news/include/card_horizontal.html' %}
+                    {% elif new.card_type == 'vertical' %}
+                        {% include 'news/include/card_vertical.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

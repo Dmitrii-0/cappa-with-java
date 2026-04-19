@@ -1,0 +1,7 @@
+{% for item in object.menuitems.all %}
+    {% if item.show %}
+    <a href="{{ item.url }}" title="{{ item.name }}"
+       class="sidebar__control-btn"
+       {% if item.image %} style="background-image: url('{{ item.image.url }}')"{% endif %}></a>
+    {% endif %}
+{% endfor %}

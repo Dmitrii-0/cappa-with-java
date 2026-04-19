@@ -1,0 +1,5 @@
+{% for item in object.menuitems.all %}
+    {% if item.show %}
+        <a class="menu__item" href="{{ item.url }}">{{ item.name }}</a>
+    {% endif %}
+{% endfor %}

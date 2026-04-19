@@ -1,0 +1,35 @@
+{% with object.group_courses.all as group_courses %}
+    {% if group_courses %}
+        <p><strong>Учебная программа:</strong></p>
+        <table class="group__courses">
+            {% for group_course in group_courses %}
+                <tr>
+                    <td>
+                        <a href="{% url 'training:course' group_course.course.slug %}"
+                           target="_blank">
+                            {{ group_course.course.title }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if object.user_is_teacher and group_course.statistics_allow_for_teacher or object.user_is_learner and group_course.statistics_allow_for_learner %}
+                            <a href="{% url 'groups:group-course-statistics' object.id %}?course_id={{ group_course.course_id }}"
+                               target="_blank">
+                                Таблица результатов
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if object.user_is_teacher and group_course.course.translator in translators_antiplag_allowed %}
+                            <a href="{% url 'groups:group-course-plag-statistics' object.id %}?course_id={{ group_course.course_id }}"
+                               target="_blank">
+                                Анализ плагиата
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Пока не назначенно ни одного учебного курса</p>
+    {% endif %}
+{% endwith %}

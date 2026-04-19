@@ -1,0 +1,75 @@
+version: "3.3"
+
+services:
+  cappa-db:
+    container_name: cappa-db
+    image: postgres:13
+    networks:
+      - localhost
+    volumes:
+      - ../postgresql-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: cappa
+      POSTGRES_PASSWORD: cappa
+      POSTGRES_DB: cappa
+    restart: always
+
+  cappa-app:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    container_name: cappa-app
+    image: cappa-app
+    volumes:
+      - ../public:/app/public
+      - import:/app/public/media/filebrowser/import
+      - sql_files:/app/public/media/filebrowser/sql_files
+      - ../src:/app/src:ro
+      - ../backup:/app/backup
+    ports:
+      - 9000:9000
+    networks:
+      - localhost
+    depends_on:
+      - cappa-db
+    environment:
+      POSTGRES_USER: cappa
+      PGPASSWORD: cappa
+      POSTGRES_DB: cappa
+      POSTGRES_HOST: cappa-db
+      APP_STATIC_ROOT: /app/public/static
+      PYTHON38_HOST: http://sandbox-python38:9001
+      GCC74_HOST: http://sandbox-gcc74:9002
+      PROLOGD_HOST: http://sandbox-prolog-d:9003
+      POSTGRESQL_HOST: http://sandbox-postgresql:9004
+      PASCAL_HOST: http://sandbox-pascal-abc:9005
+      PHP_HOST: http://sandbox-php:9006
+      CSHARP_HOST: http://sandbox-csharp:9007
+      JAVA_HOST: http://sandbox-java:9008
+      RUST186_HOST: http://sandbox-rust186:9009
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", cappa-db]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    command: >
+      sh -c "memcached -d -u memcache &&
+             cd /app/src &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0:9000 app.wsgi:application --reload -w 1"
+networks:
+  localhost:
+    external: true
+
+volumes:
+  import:
+    external: true
+
+  sql_files:
+    external: true
+
+# монтирование к ФС невозможно т.к. требуется абсолютный путь
+# для получения доступа к файлам использовать путь
+# указанный в Mountpoint команды "docker inspect docker_import"

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="center-col" xmlns="http://www.w3.org/1999/html">
+        <h1 class="text-center">Регистрация</h1>
+        <form class="signup__form white {% if form.errors %}error{% endif %}" method="POST">
+            {% csrf_token %}
+            {{ form.next }}
+            <div {% if form.username.errors %}class="error"{% endif %}>{{ form.username }}</div>
+            <div {% if form.email.errors %}class="error"{% endif %}>{{ form.email }}</div>
+            <div {% if form.first_name.errors %}class="error"{% endif %}>{{ form.first_name }}</div>
+            <div {% if form.last_name.errors %}class="error"{% endif %}>{{ form.last_name }}</div>
+            <div {% if form.password1.errors %}class="error"{% endif %}>{{ form.password1 }}</div>
+            <div {% if form.password2.errors %}class="error"{% endif %}>{{ form.password2 }}</div>
+            <small class="msg">
+                {% for error in form.errors.values %}
+                    {{ error }}
+                {% endfor %}
+            </small>
+            {% if confirm_signup %}
+                <small class="text-center">
+                    Модератор сайта проверит вашу заявку,</br>
+                    после этого Вы сможете авторизоваться на сайте
+                </small>
+            {% endif %}
+            <input type="submit" class="btn btn-primary" value="Зарегистрироваться">
+            <a class="signup__link" href="{{ signin_path }}">Войти</a>
+        </form>
+    </div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

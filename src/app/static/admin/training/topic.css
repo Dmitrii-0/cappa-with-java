@@ -1,0 +1,23 @@
+#_content-group h3 .inline_label {
+    display: none;
+}
+#_content-group .field-input label,
+#_content-group .field-content label {
+    margin-left: 12px;
+}
+#_content-group .field-text label {
+    display: none;
+}
+#_content-group .field-type label {
+    width: 50px;
+}
+#_content-group .field-input .js__editor .js__editor-content,
+#_content-group .field-content .js__editor .js__editor-content {
+    display: none;
+}
+#_content-group .field-text,
+#_content-group .field-show_input,
+#_content-group .field-input,
+#_content-group .field-content {
+    display: none;
+}
