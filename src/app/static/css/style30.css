@@ -2120,3 +2120,173 @@ li.error {
 }
 
 .hidden { display:none !important; }
+
+/* ── Java multi-file tabs ── */
+.js__java-tabs-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 0;
+    padding-bottom: 0;
+    border-bottom: 2px solid #e0e0e0;
+    margin-top: 8px;
+}
+
+.js__java-tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+    padding-bottom: 0;
+}
+
+.js__java-tab {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+    border-radius: 4px 4px 0 0;
+    background: #f5f5f5;
+    font-size: 13px;
+    font-family: monospace;
+    color: #666;
+    user-select: none;
+    transition: background 0.15s, color 0.15s;
+    margin-bottom: -2px;
+}
+
+.js__java-tab:hover {
+    background: #ebebeb;
+    color: #333;
+}
+
+.js__java-tab--active {
+    background: #ffffff;
+    color: #333;
+    border-color: #e0e0e0;
+    border-bottom-color: #ffffff;
+    font-weight: 500;
+}
+
+.js__java-tab-label {
+    pointer-events: none;
+}
+
+.js__java-tab-close {
+    font-size: 14px;
+    line-height: 1;
+    color: #aaa;
+    cursor: pointer;
+    padding: 0 2px;
+    border-radius: 3px;
+    pointer-events: all;
+}
+
+.js__java-tab-close:hover {
+    color: #c0392b;
+    background: #fdecea;
+}
+
+.js__java-tab-add {
+    align-self: center;
+    margin-left: 6px;
+    padding: 3px 10px;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #f5f5f5;
+    font-size: 16px;
+    line-height: 1;
+    color: #888;
+    transition: background 0.15s, color 0.15s;
+}
+
+.js__java-tab-add:hover {
+    background: #e8f4fd;
+    color: #2980b9;
+    border-color: #2980b9;
+}
+
+.js__java-ace-wrap {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+}
+
+.js__java-ace {
+    min-height: 200px;
+    width: 100%;
+}
+
+.js__output,
+.js__error {
+    margin-top: 8px;
+    border-radius: 4px;
+}
+
+.js__output label,
+.js__error label {
+    display: block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+}
+
+.js__output pre.js__editor-content,
+.js__error pre.js__editor-content {
+    margin: 0;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 13px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 0 4px 4px;
+}
+
+.js__output pre.js__editor-content {
+    background: #f9f9f9;
+    color: #333;
+}
+
+.js__error pre.js__editor-content {
+    background: #fff8f8;
+    color: #c0392b;
+}
+
+.solution-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+.solution-tab {
+    padding: 4px 12px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-size: 13px;
+}
+.solution-tab.active {
+    background: #fff;
+    border-bottom-color: #fff;
+    font-weight: bold;
+}
+.solution-editor.hidden {
+    display: none;
+}
+

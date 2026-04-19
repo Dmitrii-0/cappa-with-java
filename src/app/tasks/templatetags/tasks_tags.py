@@ -28,6 +28,7 @@ def show_editor(
         user_id=context.request.user.id,
         translator=translator
     ).first()
+
     if translator == TranslatorType.POSTGRESQL:
         form = SqlEditorForm(
             initial={
@@ -37,6 +38,17 @@ def show_editor(
             }
         )
         template_name = 'tasks/taskitem/parts/sql/editor.html'
+
+    elif translator == TranslatorType.JAVA:
+        form = EditorForm(
+            initial={
+                'content': draft.content if draft else '',
+                'input': '',
+                'translator': translator,
+            }
+        )
+        template_name = 'tasks/taskitem/parts/java_editor.html'
+
     else:
         form = EditorForm(
             initial={
@@ -61,3 +73,4 @@ def show_editor(
         request=context.request
     )
     return mark_safe(raw_html)
+

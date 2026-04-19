@@ -1,23 +1,17 @@
 from typing import List, Type
+
 from django.contrib.auth import get_user_model
-from app.tasks.services import exceptions
+
+from app.tasks.models import Solution, TaskItem
+from app.tasks.enums import ScoreMethod
+from app.tasks.services import SolutionService, exceptions
 from app.tasks.services.statistics import UserStatisticsService
-from app.translators.services.entities import (
-    Test,
-)
-from app.tasks.models import TaskItem
-from app.translators.services.entities import (
-    TestingResult,
-)
+
 from app.translators import services
 from app.translators.enums import TranslatorType
-from app.tasks.models import (
-    Solution
-)
-from app.tasks.enums import (
-    ScoreMethod,
-)
-from app.tasks.services import SolutionService
+from app.translators.services.entities import Test, TestingResult
+from app.translators.utils import checker_runner
+
 
 UserModel = get_user_model()
 
@@ -63,6 +57,7 @@ class BaseTaskItemService:
             )
         else:
             testing_result = None
+
         solution = SolutionService.create_internal(
             taskitem=taskitem,
             user=user,
@@ -70,6 +65,7 @@ class BaseTaskItemService:
             translator=cls.translator_type,
             testing_result=testing_result
         )
+
         if taskitem.type_course:
             version_hash = taskitem.topic.course.get_cache_data()['version_hash']
             UserStatisticsService.create_or_update_taskitem_statistics(
@@ -97,11 +93,13 @@ class BaseTaskItemService:
         only_visible: bool = True
     ) -> TestingResult:
 
-        """ Testing only enabled task tests,
-            return only enabled and visible tests """
+        """Testing only enabled task tests,
+        return only enabled and visible tests.
+        """
 
         if taskitem.score_method not in ScoreMethod.TESTS_METHODS:
             raise exceptions.OperationNotAllowed()
+
         testing_checker = taskitem.task.testing_checker
         if not testing_checker:
             raise exceptions.TestingCheckerNotExist()
@@ -115,20 +113,53 @@ class BaseTaskItemService:
             {'data_in': el['data_in'], 'data_out': el['data_out']}
             for el in enabled_tests
         ]
+
         testing_result = service_cls.testing(
             code=code,
             checker_code=testing_checker.content,
             tests=request_tests
         )
+
+        # --- CAPPA-side checking (stdout vs expected) ---
+        # Sandbox may return ok=True when execution succeeded; correctness is determined here.
+        # Normalize line endings and ignore trailing newlines for stability across languages/sandboxes.
+        tests_results = testing_result.get('tests') or []
+        all_ok = True
+
+        for test, test_result in zip(enabled_tests, tests_results):
+            expected = (test.get('data_out') or '')
+            actual = (test_result.get('result') or '')
+
+            expected = expected.replace('\r\n', '\n').rstrip('\n')
+            actual = actual.replace('\r\n', '\n').rstrip('\n')
+
+            if test_result.get('error'):
+                test_result['ok'] = False
+                all_ok = False
+                continue
+
+            ok = bool(checker_runner(
+                checker_func=testing_checker.content,
+                right_value=expected,
+                value=actual
+            ))
+            test_result['ok'] = ok
+            if not ok:
+                all_ok = False
+
+        testing_result['ok'] = all_ok
+        # --- end CAPPA-side checking ---
+
         # Remove hidden tests from result
         result = []
-        for test, test_result in zip(enabled_tests, testing_result['tests']):
+        for test, test_result in zip(enabled_tests, tests_results):
             test_result['id'] = test['id']
             if only_visible:
                 if test['visible']:
                     result.append(test_result)
             else:
                 result.append(test_result)
+
         return {
             'ok': testing_result['ok'],
             'tests': result

@@ -1,0 +1,66 @@
+{% load training_tags %}
+
+<form
+   class="editor-form js__editor-form"
+   data-autosave="false"
+   data-readonly="false"
+   data-translator="{{ form.translator.value }}"
+   data-taskitem-id="{{ object.id }}"
+   data-task-id="{{ object.task.id }}"
+>
+   <textarea
+       class="js__editor-content"
+       name="content"
+       style="display:none;"
+   >{{ form.content.value|default:'' }}</textarea>
+
+   <!-- Панель кнопок: Отправить + Сохранить + сообщения -->
+   <div class="control__bar taskitem">
+       <div class="control__bar-col col__1">
+           <div class="js__editor-btn js__editor-btn-ready" title="Отправить решение"></div>
+           <div class="js__editor-btn js__editor-btn-save" title="Сохранить в черновик"></div>
+       </div>
+       <div class="control__bar-col col__3">
+           <span class="js__msg js__msg-loader-text"></span>
+           <span class="js__msg js__msg-loader">
+               <span class="pulse"><span>{</span><span>}</span></span>
+           </span>
+           <span class="js__msg js__msg-success"></span>
+           <span class="js__msg js__msg-warning"></span>
+           <span class="js__msg js__msg-error"></span>
+       </div>
+   </div>
+
+   <!-- Вкладки файлов + кнопка "+" в одну строку -->
+   <div style="display:flex; flex-direction:row; align-items:center; flex-wrap:nowrap; border-bottom:1px solid #ddd;">
+       <div class="js__java-tabs" style="display:flex; flex-direction:row; flex-wrap:nowrap;"></div>
+       <div class="js__java-tab-add" title="Добавить файл" style="padding:4px 10px; cursor:pointer; font-size:16px; line-height:1; flex-shrink:0;">+</div>
+   </div>
+
+   <!-- ACE редактор -->
+   <div class="js__java-ace" style="min-height:400px; width:100%;"></div>
+
+   <!-- Кнопки Тестировать / Отладка — СНИЗУ после редактора -->
+   {% if show_testing_actions %}
+   <div class="control__bar taskitem" style="margin-top:8px; justify-content:center;">
+       <div class="control__bar-col col__2">
+           {% if object.task.enabled_tests %}
+               <div class="js__editor-btn js__editor-btn-tests" title="Протестировать решение"></div>
+           {% endif %}
+           <div class="js__editor-btn js__editor-btn-debug" title="Отладка"></div>
+       </div>
+   </div>
+
+   {% show_ace_field form.input %}
+
+   <div class="js__output" style="display:none;">
+       <label>Консольный вывод</label>
+       <pre class="js__editor-content"></pre>
+   </div>
+
+   <div class="js__error" style="display:none;">
+       <label>Ошибка</label>
+       <pre class="js__editor-content"></pre>
+   </div>
+   {% endif %}
+</form>

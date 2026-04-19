@@ -1,0 +1,12 @@
+docker/sha256:*
+docker/[*
+docker/=
+docker/exporting
+docker/extracting
+docker/reading
+docker/resolve
+docker/sending
+docker/starting
+docker/transferring
+docker/\[*
+public/

@@ -7,7 +7,7 @@ services:
     networks:
       - localhost
     volumes:
-      - ../postgresql-data:/var/lib/postgresql/data
+      - ../postgresql-data:/var/lib/postgresql/data:Z
     environment:
       POSTGRES_USER: cappa
       POSTGRES_PASSWORD: cappa
@@ -21,13 +21,13 @@ services:
     container_name: cappa-app
     image: cappa-app
     volumes:
-      - ../public:/app/public
+      - ../public:/app/public:Z
+      - ../src:/app/src:ro,Z
+      - ../backup:/app/backup:Z
       - import:/app/public/media/filebrowser/import
       - sql_files:/app/public/media/filebrowser/sql_files
-      - ../src:/app/src:ro
-      - ../backup:/app/backup
     ports:
-      - 9000:9000
+      - "9000:9000"
     networks:
       - localhost
     depends_on:
@@ -37,7 +37,9 @@ services:
       PGPASSWORD: cappa
       POSTGRES_DB: cappa
       POSTGRES_HOST: cappa-db
+
       APP_STATIC_ROOT: /app/public/static
+
       PYTHON38_HOST: http://sandbox-python38:9001
       GCC74_HOST: http://sandbox-gcc74:9002
       PROLOGD_HOST: http://sandbox-prolog-d:9003
@@ -47,9 +49,12 @@ services:
       CSHARP_HOST: http://sandbox-csharp:9007
       JAVA_HOST: http://sandbox-java:9008
       RUST186_HOST: http://sandbox-rust186:9009
+
+      # Вынесено в env, чтобы удобно крутить параметры без правки command
+      GUNICORN_CMD_ARGS: "--workers 2 --timeout 180 --graceful-timeout 30 --access-logfile - --error-logfile - --log-level info"
     restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-h", cappa-db]
+      test: ["CMD", "pg_isready", "-h", "cappa-db"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -58,7 +63,19 @@ services:
              cd /app/src &&
              python manage.py migrate &&
              python manage.py collectstatic --noinput &&
-             gunicorn --bind 0:9000 app.wsgi:application --reload -w 1"
+             gunicorn --bind 0.0.0.0:9000 app.wsgi:application ${GUNICORN_CMD_ARGS}"
+
+  sandbox-java:
+    build:
+      context: ../../sandbox-java
+      dockerfile: Dockerfile
+    container_name: sandbox-java
+    networks:
+      - localhost
+    expose:
+      - "9008"
+    restart: always
+
 networks:
   localhost:
     external: true
@@ -66,10 +83,5 @@ networks:
 volumes:
   import:
     external: true
-
   sql_files:
     external: true
-
-# монтирование к ФС невозможно т.к. требуется абсолютный путь
-# для получения доступа к файлам использовать путь
-# указанный в Mountpoint команды "docker inspect docker_import"
